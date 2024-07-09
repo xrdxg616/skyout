@@ -72,37 +72,39 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 新增员工
      */
     public void save(EmployeeDTO employeeDTO) {
-            Employee employee = new Employee();
-            BeanUtils.copyProperties(employeeDTO,employee);//对象属性拷贝
-            employee.setStatus(StatusConstant.ENABLE);
-            employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-            employee.setCreateTime(LocalDateTime.now());
-            employee.setUpdateTime(LocalDateTime.now());
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);//对象属性拷贝
+        employee.setStatus(StatusConstant.ENABLE);
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
 
-            employee.setCreateUser(BaseContext.getCurrentId());
-            employee.setUpdateUser(BaseContext.getCurrentId());
-            employeeMapper.insert(employee);
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.insert(employee);
 
 
     }
+
     /*
-    *分页查询
-    *@param employeeLoginDTO
+     *分页查询
+     *@param employeeLoginDTO
      * @return
-    */
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO){
+     */
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         // select * form employee limit 0,10
         //开始分页查询
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
         long total = page.getTotal();
 
         List<Employee> records = page.getResult();
-        return new PageResult(total,records);
+        return new PageResult(total, records);
 
     }
+
     /*
      * 启用禁用员工账号
      * @parm status
@@ -115,6 +117,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         /*Employee employee() = new Employee();
         employee.setStatus(status);
         employee.setId(id);*/
+
         Employee employee = Employee.builder()
                 .status(status)
                 .id(id)
@@ -122,4 +125,32 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employeeMapper.update(employee);
     }
+
+    /*
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("****");
+        return employee;
+    }
+
+    /*
+     * 编辑员工信息
+     * @parm employeeDTO
+     */
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee); //属性拷贝
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee); //需要传入Employee参数
+    }
 }
+
+
+
